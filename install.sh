@@ -2,6 +2,6 @@
 
 cd ~
 sudo echo "$(cat dwm-trent/xinitrc)" > .xinitrc
-cd dwm-titus
+cd dwm-trent
 sudo make clean install
 cd ~
