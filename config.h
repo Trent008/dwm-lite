@@ -113,7 +113,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 };
 
-static const Key startcommand = {0, 0, spawn, SHCMD ("./dwm/autostart-script")};
+static const Key startcommand = {0, 0, spawn, SHCMD ("/home/dwm-trent/autostart.sh")};
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
