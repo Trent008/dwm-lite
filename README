@@ -13,12 +13,15 @@ Installation
 Edit config.mk to match your local setup (dwm is installed into
 the /usr/local namespace by default).
 
+I always install into my home directory
+
 Afterwards run
 
     make clean install
 
 Or use my install script
 
+    cd dwm-trent
     ./install.sh
 
 this also creates a .xinitrc file with the contents of xinitrc
