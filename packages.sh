@@ -1,3 +1,5 @@
+# installs my packages including yay
+
 sudo pacman -Syu
 sudo pacman -S libxinerama libx11 libxft xorg-server xorg-xinit xorg-xsetroot arandr kitty rofi feh picom dunst
 sudo pacman -S lxappearance adapta-gtk-theme ttf-meslo-nerd ttf-nerd-fonts-symbols-mono code nano
