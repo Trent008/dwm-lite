@@ -59,7 +59,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeTxt }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
@@ -700,55 +700,45 @@ drawbar(Monitor *m)
 {
 	int x, w, tw = 0;
 	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
-	unsigned int i, occ = 0, urg = 0;
+	int boxw = drw->fonts->h / 6;
+	unsigned int i, occ = 0;
 	Client *c;
-
+	
 	if (!m->showbar)
 		return;
-
-	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setfontset(drw, drw_fontset_create(drw, nicefont, 1));
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
-	}
+	
 
 	for (c = m->clients; c; c = c->next) {
 		occ |= c->tags;
-		if (c->isurgent)
-			urg |= c->tags;
 	}
 	x = 0;
 
-	drw_setfontset(drw, drw_fontset_create(drw, monofont, 1));
+	// draw tags
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i]);
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxs, boxs, boxw, boxw,
-				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
+				m == selmon && selmon->sel && selmon->sel->tags & 1 << i, 0);
 		x += w;
 	}
 
+	drw_setscheme(drw, scheme[SchemeNorm]);
+
+	// draw bar
+	w = m->ww - x;
+	drw_rect(drw, x, 0, w, bh, 1, 1);
+
+	// draw layout
 	drw_setfontset(drw, drw_fontset_create(drw, nicefont, 1));
 	w = TEXTW(m->ltsymbol);
-	drw_setscheme(drw, scheme[SchemeNorm]);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-
-	if ((w = m->ww - tw - x) > bh) {
-		if (m->sel) {
-			drw_setfontset(drw, drw_fontset_create(drw, nicefontsmall, 1));
-			drw_text(drw, x, 0, w, bh, lrpad, m->sel->name, 0);
-			if (m->sel->isfloating)
-				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
-		} else {
-			drw_rect(drw, x, 0, w, bh, 1, 1);
-		}
-	}
+	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol);
+	
+	// draw status text
+	tw = TEXTW(stext) - lrpad + 4; /* 4px right padding */
+	drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext);
+	
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 	drw_setfontset(drw, drw_fontset_create(drw, monofont, 1));
 }
@@ -757,7 +747,7 @@ void
 drawbars(void)
 {
 	Monitor *m;
-
+	
 	for (m = mons; m; m = m->next)
 		drawbar(m);
 }

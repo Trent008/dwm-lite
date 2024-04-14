@@ -7,7 +7,6 @@ static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *nicefont[]       = { "Cantarell:size=14" };
-static const char *nicefontsmall[]       = { "Cantarell:size=12" };
 static const char *monofont[]       = { "MesloLGS Nerd Font Mono:size=14" };
 static const char col_gray1[]       = "#2E3440";
 static const char col_gray2[]       = "#3B4252";
@@ -16,8 +15,8 @@ static const char col_gray4[]       = "#ECEFF4";
 static const char col_cyan[]        = "#434C5E";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeNorm] = { "#d4f6fc", "#2a4247", col_gray2 },
+	[SchemeSel]  = { "#d4f6fc", "#54848e", col_cyan  },
 };
 
 /* tagging */
@@ -36,7 +35,7 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "kitty",           NULL,     NULL,           0,         0,        -1 },
-	{ "Thorium-browser", NULL,     NULL,      1 << 1,         0,        -1 },
+	{ "Thorium-browser", NULL,     NULL,           0,         0,        -1 },
 	{ "Spotify",         NULL,     NULL,      1 << 4,         0,         0 },
 	{ "code-oss",        NULL,     NULL,      1 << 3,         0,        -1 },
 };
