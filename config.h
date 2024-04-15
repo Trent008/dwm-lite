@@ -2,21 +2,19 @@
 
 /* appearance */
 #include <X11/X.h>
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *nicefont[]       = { "Cantarell:size=14" };
 static const char *monofont[]       = { "MesloLGS Nerd Font Mono:size=14" };
-static const char col_gray1[]       = "#2E3440";
-static const char col_gray2[]       = "#3B4252";
-static const char col_gray3[]       = "#D8DEE9";
-static const char col_gray4[]       = "#ECEFF4";
-static const char col_cyan[]        = "#434C5E";
+static const char col_black[]       = "#000000";
+static const char col_cyan1[]       = "#101e21";
+static const char col_cyan2[]       = "#81e8fc";
+static const char col_cyan3[]       = "#d4f6fc";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { "#d4f6fc", "#2a4247", col_gray2 },
-	[SchemeSel]  = { "#d4f6fc", "#54848e", col_cyan  },
+	[SchemeNorm] = { col_cyan3, col_black, col_black }, //"#2a4247", col_gray2 },
+	[SchemeSel]  = { col_cyan2, col_cyan1, col_black }, //"#54848e", col_cyan  },
 };
 
 /* tagging */
