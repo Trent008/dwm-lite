@@ -76,6 +76,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_c,      spawn,          {.v = codecmd } },
 	{ MODKEY,                       XK_b,      spawn,          SHCMD ("thorium-browser")},
 	{ MODKEY,                       XK_e,      spawn,          SHCMD ("nemo")},
+	{ MODKEY,                       XK_c,      spawn,          SHCMD ("blueberry")},
 	{ 0,                            0x1008ff02, spawn,         SHCMD ("xbacklight -inc 960")},
 	{ 0,                            0x1008ff03, spawn,         SHCMD ("xbacklight -dec 960")},
 	{ 0,                            0x1008ff11, spawn,         SHCMD ("pactl set-sink-volume 0 -2%")},
