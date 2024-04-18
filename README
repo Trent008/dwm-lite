@@ -24,7 +24,7 @@ Or use my install script
     cd dwm-trent
     ./install.sh
 
-this also creates a .xinitrc file with the contents of xinitrc
+this also creates a .xinitrc file with the contents of dwm-trent/xinitrc
 
 If you want to install all the packages I use on my system, run
 packages.sh
