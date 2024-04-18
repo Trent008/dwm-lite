@@ -111,7 +111,6 @@ typedef struct {
 struct Monitor {
 	char ltsymbol[16];
 	float mfact;
-	int nmaster;
 	int num;
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
@@ -635,7 +634,6 @@ createmon(void)
 	m = ecalloc(1, sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
-	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
 	m->lt[0] = &layouts[0];
@@ -1672,29 +1670,23 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int i, n, h, mw, my, ty;
+	unsigned int i, n, h, mw, ty;
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
-
-	if (n > m->nmaster)
-		mw = m->nmaster ? m->ww * m->mfact : 0;
-	else
-		mw = m->ww;
-	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-		if (i < m->nmaster) {
-			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx, m->wy + my, mw, h, 0);
-			if (my + c->h < m->wh)
-				my += c->h;
-		} else {
+	mw = (n > 1) ? m->ww * m->mfact : m->ww;
+	c = nexttiled(m->clients);
+	resize(c, m->wx, m->wy, mw, m->wh, 0);
+	for (i = ty = 0; c; c = nexttiled(c->next), i++) {
+		if (i > 0) {
 			h = (m->wh - ty) / (n - i);
 			resize(c, m->wx + mw, m->wy + ty, m->ww - mw, h, 0);
 			if (ty + c->h < m->wh)
-				ty += c->h;
+			ty += c->h;
 		}
+	}
 }
 
 void
