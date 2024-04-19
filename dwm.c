@@ -249,17 +249,17 @@ static const char col_cyan2[]       = "#81e8fc";
 static const char col_cyan3[]       = "#d4f6fc";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_cyan3, col_black, col_black }, //"#2a4247", col_gray2 },
-	[SchemeSel]  = { col_cyan2, col_cyan1, col_black }, //"#54848e", col_cyan  },
+	[SchemeNorm] = { col_cyan3, col_black, col_black },
+	[SchemeSel]  = { col_cyan2, col_cyan1, col_black },
 };
 
 /* tagging */
 static const char *tags[] = {
-	"1", // terminal
-	"2", // browser
-	"3", // general
-	"4", // code
-	"5", // spotify
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
 };
 
 static const Rule rules[] = {
