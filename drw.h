@@ -31,7 +31,3 @@ void drw_free(Drw *drw);
 /* Cursor abstraction */
 Cur *drw_cur_create(Drw *drw, int shape);
 void drw_cur_free(Drw *drw, Cur *cursor);
-
-
-/* Map functions */
-void drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h);

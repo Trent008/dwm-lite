@@ -897,7 +897,6 @@ manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, *t = NULL;
 	Window trans = None;
-	XWindowChanges wc;
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
@@ -923,8 +922,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->x = MAX(c->x, c->mon->wx);
 	c->y = MAX(c->y, c->mon->wy);
 
-	wc.border_width = 0;
-	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
 	updatesizehints(c);

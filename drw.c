@@ -47,16 +47,6 @@ drw_free(Drw *drw)
 	free(drw);
 }
 
-void
-drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h)
-{
-	if (!drw)
-		return;
-
-	XCopyArea(drw->dpy, drw->drawable, win, drw->gc, x, y, w, h, x, y);
-	XSync(drw->dpy, False);
-}
-
 Cur *
 drw_cur_create(Drw *drw, int shape)
 {
