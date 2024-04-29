@@ -185,7 +185,6 @@ static void setup(void);
 static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void spawn(const Arg *arg);
-static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void unfocus(Client *c, int setfocus);
@@ -240,19 +239,22 @@ static Window root, wmcheckwin;
 *******************************************************************************************************************************************
 *******************************************************************************************************************************************
 *******************************************************************************************************************************************/
+static const char dmenufont[]       = "Cantarell:size=14";
+static const char col_gray1[]       = "#222d32";
+static const char col_gray2[]       = "#35454d";
+static const char col_white1[]      = "#b9c2c7";
+static const char col_cyan[]        = "#81dbe6";
+
 /* tagging */
-static const char *tags[] = {"1","2","3","4","5",};
+static const char *tags[] = {"1",};
 
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "kitty",           NULL,     NULL,           0,         0,        -1 },
-	{ "Thorium-browser", NULL,     NULL,           0,         0,        -1 },
-	{ "Spotify",         NULL,     NULL,      1 << 4,         0,         0 },
-	{ "code-oss",        NULL,     NULL,           0,         0,        -1 },
+	/* class       instance title   tags mask     isfloating   monitor */
+	{ "firefox",   NULL,    NULL,       0,         0,        -1 },
 };
 
 /* layout(s) */
@@ -268,19 +270,18 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define MODKEY Mod4Mask
-#define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, 
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "rofi", "-show", "drun", NULL };
-static const char *termcmd[]  = { "kitty", NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_white1, "-sb", col_gray2, "-sf", col_cyan, NULL };
+static const char *termcmd[]  = { "terminator", NULL };
 static const char *spotifycmd[]= { "spotify-launcher", NULL };
 static const char *codecmd[]= { "code", NULL };
+static const char *autostart[]= { "./dwm-lite/autostart.sh", NULL };
+static const Arg autostartarg= {.v = autostart };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -288,14 +289,12 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_t,      spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_s,      spawn,          {.v = spotifycmd } },
 	{ MODKEY,                       XK_c,      spawn,          {.v = codecmd } },
-	{ MODKEY,                       XK_b,      spawn,          SHCMD ("thorium-browser")},
+	{ MODKEY,                       XK_b,      spawn,          SHCMD ("firefox")},
 	{ MODKEY,                       XK_e,      spawn,          SHCMD ("nemo")},
 	{ MODKEY,                       XK_z,      spawn,          SHCMD ("blueberry")},
-	{ MODKEY,                       XK_p,      spawn,          SHCMD ("flameshot full -p /home/trent/Pictures/")},
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD ("flameshot gui -p /home/trent/Pictures/")},
-	{ MODKEY|ControlMask,           XK_p,      spawn,          SHCMD ("flameshot gui --clipboard")},
-	{ 0,                            0x1008ff02, spawn,         SHCMD ("xbacklight -inc 960")},
-	{ 0,                            0x1008ff03, spawn,         SHCMD ("xbacklight -dec 960")},
+	{ MODKEY,                       XK_p,      spawn,          SHCMD ("shotgun")},
+	{ 0,                            0x1008ff02, spawn,         SHCMD ("brightnessctl set +2%")},
+	{ 0,                            0x1008ff03, spawn,         SHCMD ("brightnessctl set 2%-")},
 	{ 0,                            0x1008ff11, spawn,         SHCMD ("pactl set-sink-volume 0 -2%")},
 	{ 0,                            0x1008ff12, spawn,         SHCMD ("pactl set-sink-mute 0 toggle")},
 	{ 0,                            0x1008ff13, spawn,         SHCMD ("pactl set-sink-volume 0 +2%")},
@@ -311,15 +310,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 };
-
-static const Key startcommand = {0, 0, spawn, SHCMD ("/home/trent/dwm-trent/autostart.sh")};
 
 /* end of configuration
 *******************************************************************************************************************************************
@@ -1118,7 +1110,7 @@ run(void)
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
-	startcommand.func(&(startcommand.arg));
+	spawn(&autostartarg);
 	while (running && !XNextEvent(dpy, &ev))
 		if (handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
@@ -1368,16 +1360,6 @@ spawn(const Arg *arg)
 
 		execvp(((char **)arg->v)[0], (char **)arg->v);
 		die("dwm: execvp '%s' failed:", ((char **)arg->v)[0]);
-	}
-}
-
-void
-tag(const Arg *arg)
-{
-	if (selmon->sel && arg->ui & TAGMASK) {
-		selmon->sel->tags = arg->ui & TAGMASK;
-		focus(NULL);
-		arrange(selmon);
 	}
 }
 
