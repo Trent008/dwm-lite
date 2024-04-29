@@ -248,15 +248,6 @@ static const char col_cyan[]        = "#81dbe6";
 /* tagging */
 static const char *tags[] = {"1",};
 
-static const Rule rules[] = {
-	/* xprop(1):
-	 *	WM_CLASS(STRING) = instance, class
-	 *	WM_NAME(STRING) = title
-	 */
-	/* class       instance title   tags mask     isfloating   monitor */
-	{ "firefox",   NULL,    NULL,       0,         0,        -1 },
-};
-
 /* layout(s) */
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
@@ -285,12 +276,12 @@ static const Arg autostartarg= {.v = autostart };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_m,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_t,      spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_s,      spawn,          {.v = spotifycmd } },
 	{ MODKEY,                       XK_c,      spawn,          {.v = codecmd } },
 	{ MODKEY,                       XK_b,      spawn,          SHCMD ("firefox")},
-	{ MODKEY,                       XK_e,      spawn,          SHCMD ("nemo")},
+	{ MODKEY,                       XK_e,      spawn,          SHCMD ("thunar")},
 	{ MODKEY,                       XK_z,      spawn,          SHCMD ("blueberry")},
 	{ MODKEY,                       XK_p,      spawn,          SHCMD ("shotgun")},
 	{ 0,                            0x1008ff02, spawn,         SHCMD ("brightnessctl set +2%")},
@@ -327,32 +318,13 @@ struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 void
 applyrules(Client *c)
 {
-	const char *class, *instance;
-	unsigned int i;
-	const Rule *r;
-	Monitor *m;
 	XClassHint ch = { NULL, NULL };
 
 	/* rule matching */
 	c->isfloating = 0;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
-	class    = ch.res_class ? ch.res_class : broken;
-	instance = ch.res_name  ? ch.res_name  : broken;
 
-	for (i = 0; i < LENGTH(rules); i++) {
-		r = &rules[i];
-		if ((!r->title || strstr(c->name, r->title))
-		&& (!r->class || strstr(class, r->class))
-		&& (!r->instance || strstr(instance, r->instance)))
-		{
-			c->isfloating = r->isfloating;
-			c->tags |= r->tags;
-			for (m = mons; m && m->num != r->monitor; m = m->next);
-			if (m)
-				c->mon = m;
-		}
-	}
 	if (ch.res_class)
 		XFree(ch.res_class);
 	if (ch.res_name)
