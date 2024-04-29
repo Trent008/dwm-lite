@@ -39,8 +39,9 @@
 #include <X11/Xft/Xft.h>
 #include <X11/X.h>
 
-#include "drw.h"
-#include "util.h"
+#define MAX(A, B)               ((A) > (B) ? (A) : (B))
+#define MIN(A, B)               ((A) < (B) ? (A) : (B))
+#define BETWEEN(X, A, B)        ((A) <= (X) && (X) <= (B))
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
@@ -120,13 +121,26 @@ struct Monitor {
 };
 
 typedef struct {
-	const char *class;
-	const char *instance;
-	const char *title;
-	unsigned int tags;
-	int isfloating;
-	int monitor;
-} Rule;
+	Cursor cursor;
+} Cur;
+
+typedef struct Fnt {
+	Display *dpy;
+	unsigned int h;
+	FcPattern *pattern;
+	struct Fnt *next;
+} Fnt;
+
+typedef XftColor Clr;
+
+typedef struct {
+	unsigned int w, h;
+	Display *dpy;
+	int screen;
+	Window root;
+	Drawable drawable;
+	GC gc;
+} Drw;
 
 /* function declarations */
 static void applyrules(Client *c);
@@ -201,6 +215,17 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
+/* Drawable abstraction */
+Drw *drw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h);
+void drw_resize(Drw *drw, unsigned int w, unsigned int h);
+void drw_free(Drw *drw);
+
+/* Cursor abstraction */
+Cur *drw_cur_create(Drw *drw, int shape);
+void drw_cur_free(Drw *drw, Cur *cursor);
+/* Utilities */
+void die(const char *fmt, ...);
+void *ecalloc(size_t nmemb, size_t size);
 
 /* variables */
 static const char broken[] = "broken";
@@ -635,6 +660,25 @@ detachstack(Client *c)
 	}
 }
 
+void
+die(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
+		fputc(' ', stderr);
+		perror(NULL);
+	} else {
+		fputc('\n', stderr);
+	}
+
+	exit(1);
+}
+
 Monitor *
 dirtomon(int dir)
 {
@@ -648,6 +692,77 @@ dirtomon(int dir)
 	else
 		for (m = mons; m->next != selmon; m = m->next);
 	return m;
+}
+
+Drw *
+drw_create(Display *dpy, int screen, Window root, unsigned int w, unsigned int h)
+{
+	Drw *drw = ecalloc(1, sizeof(Drw));
+
+	drw->dpy = dpy;
+	drw->screen = screen;
+	drw->root = root;
+	drw->w = w;
+	drw->h = h;
+	drw->drawable = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
+	drw->gc = XCreateGC(dpy, root, 0, NULL);
+	XSetLineAttributes(dpy, drw->gc, 1, LineSolid, CapButt, JoinMiter);
+
+	return drw;
+}
+
+void
+drw_resize(Drw *drw, unsigned int w, unsigned int h)
+{
+	if (!drw)
+		return;
+
+	drw->w = w;
+	drw->h = h;
+	if (drw->drawable)
+		XFreePixmap(drw->dpy, drw->drawable);
+	drw->drawable = XCreatePixmap(drw->dpy, drw->root, w, h, DefaultDepth(drw->dpy, drw->screen));
+}
+
+void
+drw_free(Drw *drw)
+{
+	XFreePixmap(drw->dpy, drw->drawable);
+	XFreeGC(drw->dpy, drw->gc);
+	free(drw);
+}
+
+Cur *
+drw_cur_create(Drw *drw, int shape)
+{
+	Cur *cur;
+
+	if (!drw || !(cur = ecalloc(1, sizeof(Cur))))
+		return NULL;
+
+	cur->cursor = XCreateFontCursor(drw->dpy, shape);
+
+	return cur;
+}
+
+void
+drw_cur_free(Drw *drw, Cur *cursor)
+{
+	if (!cursor)
+		return;
+
+	XFreeCursor(drw->dpy, cursor->cursor);
+	free(cursor);
+}
+
+void *
+ecalloc(size_t nmemb, size_t size)
+{
+	void *p;
+
+	if (!(p = calloc(nmemb, size)))
+		die("calloc:");
+	return p;
 }
 
 void
