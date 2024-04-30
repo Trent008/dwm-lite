@@ -267,7 +267,7 @@ static const char col_cyan[]        = "#81dbe6";
 
 
 /* layout(s) */
-static const float mfact     = 0.625; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.8125; /* factor of master area size [0.05..0.95] */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
@@ -310,8 +310,8 @@ static const Key keys[] = {
 	{ 0,                            0x1008FF14, spawn,         SHCMD ("playerctl play-pause")},
 	{ 0,                            0x1008FF16, spawn,         SHCMD ("playerctl previous")},
 	{ 0,                            0x1008FF17, spawn,         SHCMD ("playerctl next")},
-	{ MODKEY,                       XK_Left,      setmfact,       {.f = -0.03125} },
-	{ MODKEY,                       XK_Right,      setmfact,       {.f = +0.03125} },
+	{ MODKEY,                       XK_Left,   setmfact,       {.f = -0.03125} },
+	{ MODKEY,                       XK_Right,  setmfact,       {.f = +0.03125} },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
